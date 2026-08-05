@@ -8,6 +8,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.concurrent.ScheduledFuture;
 
@@ -18,6 +19,7 @@ public class SchedulerService {
     private final TaskScheduler taskScheduler;
     private final SyncConfigRepository syncConfigRepository;
     private final AsanaSyncService asanaSyncService;
+    private final SyncProgressTracker progressTracker;
 
     private ScheduledFuture<?> currentTask;
 
@@ -70,13 +72,22 @@ public class SchedulerService {
         syncConfigRepository.save(config);
     }
 
-    /** Runs a sync immediately, outside the schedule (manual trigger from the app). */
-    public AsanaSyncService.SyncResult runNow() {
-        AsanaSyncService.SyncResult result = asanaSyncService.syncAllTrackedProjects();
-        SyncConfig config = getOrCreateConfig();
-        config.setLastRunStatus("manual run: " + result.succeeded() + " succeeded, " + result.failed() + " failed");
-        config.setLastRunAt(LocalDateTime.now().toString());
-        syncConfigRepository.save(config);
-        return result;
+    /** Kicks off a sync immediately in the background (manual trigger from the app), so the
+     * triggering HTTP request can return right away and the frontend polls SyncProgressTracker
+     * for progress. Returns false without starting anything if a sync is already running. */
+    public boolean triggerRunNow() {
+        if (progressTracker.isRunning()) return false;
+        taskScheduler.schedule(() -> {
+            SyncConfig config = getOrCreateConfig();
+            try {
+                AsanaSyncService.SyncResult result = asanaSyncService.syncAllTrackedProjects();
+                config.setLastRunStatus("manual run: " + result.succeeded() + " succeeded, " + result.failed() + " failed");
+            } catch (Exception e) {
+                config.setLastRunStatus("error: " + e.getMessage());
+            }
+            config.setLastRunAt(LocalDateTime.now().toString());
+            syncConfigRepository.save(config);
+        }, Instant.now());
+        return true;
     }
 }

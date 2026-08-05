@@ -19,6 +19,7 @@ public class AsanaSyncService {
     private final AsanaClient asanaClient;
     private final JdbcTemplate jdbcTemplate;
     private final FieldNameMapper fieldNameMapper;
+    private final SyncProgressTracker progressTracker;
 
     private static final String TASK_OPT_FIELDS = String.join(",",
         "name", "notes", "completed", "completed_at", "due_on",
@@ -34,19 +35,28 @@ public class AsanaSyncService {
     /** Resyncs every project already tracked in the local database (nightly job). */
     public SyncResult syncAllTrackedProjects() {
         List<String> gids = jdbcTemplate.queryForList("SELECT gid FROM projects", String.class);
-        int succeeded = 0, failed = 0;
-        List<String> errors = new ArrayList<>();
-
-        for (String gid : gids) {
-            try {
-                syncProject(gid);
-                succeeded++;
-            } catch (Exception e) {
-                failed++;
-                errors.add(gid + ": " + e.getMessage());
-            }
+        if (!progressTracker.tryStart(gids.size())) {
+            throw new IllegalStateException("A sync is already running");
         }
-        return new SyncResult(succeeded, failed, errors);
+        try {
+            int succeeded = 0, failed = 0;
+            List<String> errors = new ArrayList<>();
+
+            for (String gid : gids) {
+                try {
+                    syncProject(gid);
+                    succeeded++;
+                    progressTracker.recordResult(true);
+                } catch (Exception e) {
+                    failed++;
+                    errors.add(gid + ": " + e.getMessage());
+                    progressTracker.recordResult(false);
+                }
+            }
+            return new SyncResult(succeeded, failed, errors);
+        } finally {
+            progressTracker.finish();
+        }
     }
 
     /** Syncs one project (and all its tasks/custom fields) into MySQL. */

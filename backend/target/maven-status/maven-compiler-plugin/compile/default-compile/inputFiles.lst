@@ -24,3 +24,4 @@
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/AsanaSyncService.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/FieldNameMapper.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/SchedulerService.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/SyncProgressTracker.java

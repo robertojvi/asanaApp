@@ -529,6 +529,12 @@ tr.row-completed {
   background: var(--color-bg);
 }
 
+.project-row.selected,
+.project-row.selected:hover {
+  background: var(--color-amber);
+  color: var(--color-navy);
+}
+
 .project-name {
   flex: 1;
   overflow: hidden;

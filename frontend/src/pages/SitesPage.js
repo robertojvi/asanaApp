@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 
+function siteLabel(s) {
+  return s.venueName ? `${s.venueName} - ${s.subvenueName}` : (s.subvenueName || '');
+}
+
 export default function SitesPage() {
   const { canEdit } = useAuth();
   const [sites, setSites] = useState([]);
@@ -67,14 +71,15 @@ export default function SitesPage() {
         {sites
           .filter((s) => (s.subvenueName || '').toLowerCase().includes(search.trim().toLowerCase())
             || (s.venueName || '').toLowerCase().includes(search.trim().toLowerCase()))
+          .slice()
+          .sort((a, b) => siteLabel(a).localeCompare(siteLabel(b)))
           .map((s) => (
           <div
             key={s.subvenueId}
-            className="project-row"
+            className={`project-row${selected?.subvenueId === s.subvenueId ? ' selected' : ''}`}
             onClick={() => setSelected(s)}
-            style={{ background: selected?.subvenueId === s.subvenueId ? 'var(--color-navy, #1b2a4a)' : undefined }}
           >
-            <span className="project-name">{s.venueName ? `${s.venueName} - ` : ''}{s.subvenueName}</span>
+            <span className="project-name">{siteLabel(s)}</span>
             {s.asanaProjectGid && <span title="Has an Asana project" style={{ marginLeft: 6, color: '#8bc34a' }}>●</span>}
           </div>
         ))}

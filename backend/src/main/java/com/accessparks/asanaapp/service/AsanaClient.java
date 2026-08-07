@@ -63,6 +63,8 @@ public class AsanaClient {
                 Thread.currentThread().interrupt();
             }
             return exchangeWithRetry(url, method, body);
+        } catch (HttpClientErrorException e) {
+            throw new RuntimeException("Asana API call failed: " + url + " - " + e.getStatusCode() + " " + e.getResponseBodyAsString(), e);
         } catch (Exception e) {
             throw new RuntimeException("Asana API call failed: " + url, e);
         }
@@ -73,7 +75,7 @@ public class AsanaClient {
         Map<String, Object> data = new HashMap<>();
         data.put("name", name);
         data.put("include", new String[]{
-            "custom_fields", "forms", "members", "task_notes", "task_assignee",
+            "forms", "members", "task_notes", "task_assignee",
             "task_subtasks", "task_attachments", "task_dates", "task_dependencies",
             "task_followers", "task_tags", "task_projects"
         });

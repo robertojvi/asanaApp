@@ -1,0 +1,2 @@
+# IDE run configurations may contain local secrets (env vars); keep them untracked.
+backend/.idea/runConfigurations/

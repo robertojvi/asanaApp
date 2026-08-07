@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 export default function ProjectsPage() {
   const { canEdit } = useAuth();
   const [projects, setProjects] = useState([]);
+  const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(new Set());
   const [tasks, setTasks] = useState([]);
   const [showNewProject, setShowNewProject] = useState(false);
@@ -74,7 +75,17 @@ export default function ProjectsPage() {
             )}
           </div>
         )}
-        {projects.map((p) => (
+        <input
+          type="text"
+          className="project-search"
+          placeholder="Search projects..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ marginBottom: 8, width: '100%', boxSizing: 'border-box' }}
+        />
+        {projects
+          .filter((p) => p.project.toLowerCase().includes(search.trim().toLowerCase()))
+          .map((p) => (
           <div key={p.project_gid} className="project-row" onClick={() => toggle(p.project_gid)}>
             <input type="checkbox" checked={selected.has(p.project_gid)} readOnly />
             <span className="project-name">{p.project}</span>

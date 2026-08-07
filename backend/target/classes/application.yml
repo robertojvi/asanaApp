@@ -32,5 +32,8 @@ jira:
   email: ${JIRA_EMAIL}
   api-token: ${JIRA_API_TOKEN}
 
+sitelist:
+  base-url: ${SITELIST_BASE_URL:http://192.168.102.32/views}
+
 sync:
   default-cron: "0 0 3 * * *" # 3am daily, matches the Node nightly resync

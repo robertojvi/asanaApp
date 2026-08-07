@@ -44,6 +44,14 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Tolerant HTML parser for scraping the site inventory dashboard, whose
+         markup is irregular (unquoted attributes, nested html/body tags). -->
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>1.18.1</version>
+    </dependency>
+
     <!-- JWT -->
     <dependency>
       <groupId>io.jsonwebtoken</groupId>

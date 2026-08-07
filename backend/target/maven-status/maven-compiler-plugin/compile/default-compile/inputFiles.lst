@@ -5,6 +5,7 @@
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/controller/JiraController.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/controller/ProjectController.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/controller/ReportController.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/controller/SiteController.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/controller/SyncController.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/controller/UserController.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/dto/AuthDtos.java
@@ -15,12 +16,18 @@
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/JiraIssue.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/JiraProject.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/Role.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/Site.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/SiteDevice.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/SiteLocation.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/SyncConfig.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/AppUserRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/AsanaProjectRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/AsanaTaskRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/JiraIssueRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/JiraProjectRepository.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/SiteDeviceRepository.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/SiteLocationRepository.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/SiteRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/SyncConfigRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/security/CustomUserDetailsService.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/security/JwtAuthFilter.java
@@ -31,4 +38,6 @@
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/JiraClient.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/JiraSyncService.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/SchedulerService.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/SiteInventoryClient.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/SiteInventorySyncService.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/SyncProgressTracker.java

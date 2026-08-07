@@ -25,6 +25,9 @@ Install these if you don't already have them:
 You'll also need:
 - An **Asana Personal Access Token** (Asana → profile → Settings → Apps → Manage Developer Apps → Create New Personal Access Token)
 - Your **Asana workspace gid** (`943649575918213` for AccessParks Broadband)
+- A **Jira Cloud API token**, for the Jira Projects page (see Part 3.1)
+- Network access (office/VPN) to the internal site inventory dashboard at
+  `http://192.168.102.32`, for the Sites page
 
 ---
 
@@ -89,9 +92,28 @@ export DB_USER=root
 export DB_PASSWORD=your_mysql_password
 export ASANA_TOKEN=your_asana_personal_access_token
 export JWT_SECRET=$(openssl rand -base64 48)
+export JIRA_SITE_URL=yoursite.atlassian.net
+export JIRA_EMAIL=your-atlassian-account-email@example.com
+export JIRA_API_TOKEN=your_jira_api_token
 ```
 
-Tip: put these in a `.env`-style shell script (e.g. `set-env.sh`) and `source set-env.sh` each time you open a new terminal, so you don't retype them.
+**`DB_PASSWORD`, `ASANA_TOKEN`, `JIRA_SITE_URL`, `JIRA_EMAIL`, and `JIRA_API_TOKEN` are all required** — the backend fails to start if any of them is unset, even if you don't plan to use the Jira Projects page today.
+
+To get a Jira API token: log into Jira Cloud, go to
+`id.atlassian.com/manage-profile/security/api-tokens`, click **Create API
+token**, and copy the value immediately (it's shown once). `JIRA_SITE_URL` is
+the subdomain you use to reach Jira — `https://yoursite.atlassian.net` means
+the value is `yoursite.atlassian.net` (no `https://`, no trailing slash).
+`JIRA_EMAIL` is the email of the Atlassian account that generated the token.
+
+One more variable, for the **Sites** page, is optional since it already has a
+default matching AccessParks' internal dashboard — only set it if that
+address changes:
+```bash
+export SITELIST_BASE_URL=http://192.168.102.32/views   # default, override only if needed
+```
+
+Tip: put these in a `.env`-style shell script (e.g. `set-env.sh`) and `source set-env.sh` each time you open a new terminal, so you don't retype them. (Or add them permanently to your shell profile — `~/.zshrc` on macOS with zsh — so every new terminal picks them up automatically.)
 
 ### 3.2 Create the app's own tables and seed the first login
 
@@ -104,6 +126,12 @@ mysql -u root -p asana_mirror < src/main/resources/db/init-app-tables.sql
 This adds two new tables (`app_users`, `sync_config`) to your existing database and creates one login:
 - **Email**: whatever you set in the SQL file
 - **Password**: `ChangeMe123!`
+
+Unlike the Asana tables (Part 1) or the two above, the tables behind the
+**Jira Projects** and **Sites** pages (`jira_projects`, `jira_issues`,
+`sites`, `site_locations`, `site_devices`) need **no manual SQL at all** —
+Hibernate creates them automatically the first time the backend starts,
+since they're owned entirely by this app with no legacy Node tool involved.
 
 ### 3.3 Build and run
 
@@ -153,10 +181,12 @@ This opens `http://localhost:3000` in your browser automatically. It talks to th
 - [ ] `mysql -u root -p asana_mirror -e "SHOW TABLES;"` shows `app_users` and `sync_config` alongside the original tables
 - [ ] Backend logs show `Started AsanaAppApplication` with no errors
 - [ ] You can log in at `localhost:3000`
-- [ ] The **Projects** page lists your ~200 AccessParks projects with completion percentages
+- [ ] The **Asana Projects** page lists your ~200 AccessParks projects with completion percentages
 - [ ] Selecting a project shows its tasks with due dates
 - [ ] **Reports** page shows the progress-by-corporate table
 - [ ] (Super User only) **Users** page lists your account
+- [ ] (Admin/Super User) On the **Jira Projects** page, clicking **Sync Now** pulls your Jira Cloud projects and issues in
+- [ ] (Admin/Super User) On the **Sites** page, clicking **Sync Now** pulls all sites from the internal dashboard (~12 minutes for ~243 sites) and shows a linked Asana project for sites that have one
 
 ---
 
@@ -177,6 +207,11 @@ crontab -e
 
 If you switch to Option A, remove any cron entry from Option B first.
 
+**Jira Projects and Sites are manual-sync only** — there's no scheduled cron
+for either yet, just a **Sync Now** button on each page (Admin/Super User).
+Re-run it whenever you want fresher data; both are safe to re-run anytime
+(they update existing rows rather than duplicating them).
+
 ---
 
 ## Troubleshooting quick reference
@@ -189,3 +224,7 @@ If you switch to Option A, remove any cron entry from Option B first.
 | React app shows blank/network error | Backend not running, or wrong port | Confirm `mvn spring-boot:run` is still running in its terminal; check `REACT_APP_API_URL` if backend isn't on 8080 |
 | "Failed to update Asana" when editing a date | Asana API rejected the write (bad date format, revoked token, etc.) | Check the backend logs for the detailed Asana error message |
 | `mvn spring-boot:run` can't download dependencies | No internet access, or a corporate proxy/firewall blocking Maven Central | Make sure your machine can reach `repo.maven.apache.org` |
+| Backend won't start: `Could not resolve placeholder 'jira.site-url'` (or `.email`/`.api-token`) | `JIRA_SITE_URL`/`JIRA_EMAIL`/`JIRA_API_TOKEN` isn't set | Export all three (Part 3.1) — the backend needs them to boot at all, even if you don't use the Jira Projects page |
+| Jira Projects sync reports 0 issues with no visible error | The sync response includes an `errors` array the UI now surfaces inline in the "Synced..." status message — check that text for the actual per-project error | Usually a Jira API/auth issue; check the backend logs for the full stack trace |
+| Sites page: "Sync Now" seems stuck for several minutes | Expected for a full sync — it fetches ~243 sites sequentially over the network before writing anything, then writes ~17k locations and ~31k devices. Total run is roughly 10-12 minutes | Just wait; if it's genuinely hung (no CPU activity, no growth in `site_devices` row count over a couple minutes), check the backend logs for a stack trace |
+| Sites sync fails to reach the dashboard | Not on the office network/VPN that can reach `192.168.102.32` | Connect to the network that has access, or update `SITELIST_BASE_URL` if the dashboard has moved |

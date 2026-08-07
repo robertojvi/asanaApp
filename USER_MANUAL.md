@@ -2,24 +2,34 @@
 
 ## What this app does
 
-A web app that mirrors your team's Asana projects into a local database for
-fast browsing and reporting, lets you edit task due dates (writes straight
-back to Asana), create new projects from templates, and control how often
-everything stays in sync — all behind a login with three permission levels.
+A web app that mirrors your team's **Asana** projects, **Jira Cloud**
+projects/issues, and the internal **site inventory dashboard** (venues,
+locations, and network devices) into a local database for fast browsing and
+reporting. It lets you edit Asana task due dates (writes straight back to
+Asana), create new Asana projects from templates, see each site's linked
+Asana project so you can create/update tasks for it, and control how often
+Asana data stays in sync — all behind a login with three permission levels.
 
 ## Roles at a glance
 
 | Can do | Super User | Admin | User |
 |---|:---:|:---:|:---:|
-| View projects and tasks | ✅ | ✅ | ✅ |
+| View Asana projects and tasks | ✅ | ✅ | ✅ |
+| View Jira projects and issues | ✅ | ✅ | ✅ |
+| View sites, locations, and devices | ✅ | ✅ | ✅ |
 | View reports | ✅ | ✅ | ✅ |
-| Edit task due dates | ✅ | ✅ | ❌ |
-| Create new projects | ✅ | ✅ | ❌ |
-| Run or schedule syncs | ✅ | ✅ | ❌ |
+| Edit Asana task due dates | ✅ | ✅ | ❌ |
+| Create new Asana projects | ✅ | ✅ | ❌ |
+| Run or schedule the Asana sync | ✅ | ✅ | ❌ |
+| Run the Jira sync | ✅ | ✅ | ❌ |
+| Run the Sites sync | ✅ | ✅ | ❌ |
 | Create/edit/disable user accounts | ✅ | ❌ | ❌ |
 
 If you're a **User**, everything below still applies to you except the Sync
-and Users pages, which won't appear in your navigation bar at all.
+and Users pages (which won't appear in your navigation bar at all) and the
+**Sync Now** buttons on the Jira Projects and Sites pages, which won't be
+visible to you either — you can still view everything on those pages, just
+not trigger a refresh.
 
 ---
 
@@ -33,9 +43,10 @@ Your session stays active until you log out or the token expires (24 hours).
 
 ---
 
-## Projects page (home screen)
+## Asana Projects page (home screen)
 
-This is what you land on after logging in.
+This is what you land on after logging in. (Labeled **Asana Projects** in
+the nav bar, to tell it apart from the separate Jira Projects page.)
 
 ### Browsing projects
 
@@ -86,6 +97,80 @@ message when it's done.
 
 ---
 
+## Jira Projects page
+
+Mirrors your team's **Jira Cloud** projects and issues, the same way the
+Asana Projects page mirrors Asana.
+
+### Browsing projects and issues
+
+The left panel lists every Jira project currently tracked. Search narrows
+the list as you type. Click a project to select it — you can select
+multiple projects at once, same as the Asana Projects page.
+
+Once selected, the table on the right shows every issue in those projects:
+key, summary, status, type, priority, assignee, and due date. This view is
+read-only — editing Jira issues from this app isn't supported yet.
+
+### Syncing (Admin / Super User only)
+
+Click **Sync Now** in the left panel to pull fresh projects and issues from
+Jira Cloud. Unlike the Asana sync, there's no scheduled/automatic option
+yet — you have to click it each time you want fresher data. The status
+message shows how many projects and issues were synced, and lists any
+per-project errors inline if something failed partway through.
+
+If you see "No Jira projects yet," nobody has run a sync since this feature
+was set up — click **Sync Now** to pull the first batch.
+
+---
+
+## Sites page
+
+Mirrors the internal site inventory dashboard (venue/subvenue details,
+network locations, and devices) into the app, including each site's linked
+**Asana project** — useful when you need to jump straight from a site to
+its Asana project to create or update tasks and subtasks.
+
+### Browsing sites
+
+The left panel lists every site, sorted alphabetically by venue and site
+name. Search narrows the list as you type. A green dot next to a site means
+it has a linked Asana project. Click a site to view its details — this page
+only shows one site at a time (unlike the multi-select Asana/Jira pages).
+
+### Viewing a site's details
+
+Selecting a site shows:
+- A summary card: **Asana Project** (a direct link, when one exists),
+  address, website, front desk phone, operating season, office hours,
+  managers, ISP, electric utility, and launch status
+- **Jira Location/Device List**: every physical location at the site
+  (building, pole, etc. with GPS coordinates and notes), and under each
+  location, every network device installed there — name, manufacturer,
+  model, management IP/MAC, serial number, power source, what it connects
+  to upstream, and notes
+
+This is read-only, same as the Jira Projects page.
+
+### Syncing (Admin / Super User only)
+
+Click **Sync Now** in the left panel to re-pull everything from the
+internal dashboard. This is a much bigger sync than Jira or Asana — it
+fetches roughly 243 sites, ~17,000 locations, and ~31,000 devices, and
+takes **around 10-12 minutes**. The page shows a status message the whole
+time; it's normal for it to say "Syncing..." for several minutes with
+nothing else happening on screen. Like the Jira sync, there's no scheduled
+option yet, and it's safe to re-run anytime — it updates existing rows
+rather than duplicating them.
+
+If a site's "Contractors" or other free-text fields look garbled or
+incomplete, that's a known limitation of scraping the dashboard's page
+layout for those specific free-form sections — the well-structured fields
+(address, contacts, locations, devices) aren't affected.
+
+---
+
 ## Reports page
 
 Available to everyone, including read-only Users.
@@ -112,7 +197,10 @@ directly.
 
 ## Sync page (Admin / Super User only)
 
-Controls how the local database stays in sync with Asana.
+Controls how the local database stays in sync with **Asana** specifically —
+this page doesn't touch Jira or Sites data. Those two have their own
+**Sync Now** buttons directly on the Jira Projects and Sites pages instead,
+with no scheduling option yet (see those sections above).
 
 ### Run sync now
 
@@ -173,9 +261,21 @@ support — password changes may need to go through the API directly for now.)
 - **Template project**: a project set up as a starting point to duplicate
   from, rather than to track real work in. AccessParks keeps several of
   these (Implementation Template, Template Pole, etc.).
-- **Sync**: the process of pulling current data from Asana into the local
-  database, so the app can show fast, rich reports without hitting Asana's
-  API on every page load.
+- **Sync**: the process of pulling current data from Asana, Jira, or the
+  site inventory dashboard into the local database, so the app can show
+  fast, rich reports without hitting those systems on every page load.
+- **Jira issue**: Jira's equivalent of an Asana task — a ticket with a
+  status, assignee, priority, and due date, belonging to a Jira project.
+- **Site / subvenue**: one physical location AccessParks provides service
+  to (e.g. a specific KOA campground), as tracked in the internal site
+  inventory dashboard. Each site can belong to a broader "venue" (e.g. a
+  KOA property with a marina site and a trailside site) and can have a
+  linked Asana project for tracking its implementation/support work.
+- **Location** (on the Sites page): a physical spot within a site where
+  network equipment lives — a building, pole, etc. — with GPS coordinates.
+- **Device** (on the Sites page): a piece of network hardware (router,
+  switch, access point, etc.) installed at a location, including its
+  management IP/MAC, serial number, and what it connects to upstream.
 
 ---
 

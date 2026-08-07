@@ -22,6 +22,11 @@ app:
   jwt:
     secret: ${JWT_SECRET:change-this-to-a-long-random-string-in-production}
     expiration-ms: 86400000 # 24h
+  cors:
+    # Comma-separated origin patterns ('*' wildcard allowed). Defaults cover
+    # localhost plus the two most common private LAN ranges so the app works
+    # over the network out of the box; override if your subnet differs.
+    allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:3000,http://192.168.*.*:3000,http://10.*.*.*:3000}
 
 asana:
   token: ${ASANA_TOKEN}

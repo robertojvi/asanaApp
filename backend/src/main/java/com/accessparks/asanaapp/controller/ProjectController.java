@@ -109,6 +109,9 @@ public class ProjectController {
             if (request.expectedDueDateFieldGid() != null) {
                 data.put("custom_fields", Map.of(request.expectedDueDateFieldGid(), request.expectedDueDate()));
             }
+            if (request.completed() != null) {
+                data.put("completed", request.completed());
+            }
             if (data.isEmpty()) return ResponseEntity.badRequest().body(Map.of("error", "No fields to update"));
 
             asanaClient.put("/tasks/" + taskGid, data);
@@ -121,6 +124,9 @@ public class ProjectController {
                     "UPDATE task_custom_field_values SET value_text = ? WHERE task_gid = ? AND custom_field_gid = ?",
                     request.expectedDueDate(), taskGid, request.expectedDueDateFieldGid()
                 );
+            }
+            if (request.completed() != null) {
+                jdbcTemplate.update("UPDATE tasks SET completed = ? WHERE gid = ?", request.completed(), taskGid);
             }
             return ResponseEntity.ok(Map.of("success", true));
         } catch (Exception e) {

@@ -14,6 +14,7 @@ public class ProjectDtos {
     public record UpdateTaskDateRequest(
         String dueOn, // "YYYY-MM-DD" or null to clear
         String expectedDueDateFieldGid, // custom field gid, if updating that field
-        String expectedDueDate // "YYYY-MM-DD" or null
+        String expectedDueDate, // "YYYY-MM-DD" or null
+        Boolean completed // null means "not being updated"
     ) {}
 }

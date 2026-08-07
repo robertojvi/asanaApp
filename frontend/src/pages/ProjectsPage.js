@@ -90,7 +90,7 @@ export default function ProjectsPage() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Task</th><th>Project</th><th>Assignee</th>
+                  <th>Done</th><th>Task</th><th>Project</th><th>Assignee</th>
                   <th>Due date</th><th>Expected Due Date</th>
                 </tr>
               </thead>
@@ -110,9 +110,17 @@ export default function ProjectsPage() {
 function TaskRow({ task, canEdit, onSave }) {
   const [dueOn, setDueOn] = useState(task.due_on ? task.due_on.slice(0, 10) : '');
   const [expDate, setExpDate] = useState((task.expected_due_date || '').slice(0, 10));
+  const [completed, setCompleted] = useState(!!task.completed);
 
   return (
-    <tr className={task.completed ? 'row-completed' : ''}>
+    <tr className={completed ? 'row-completed' : ''}>
+      <td>
+        <input type="checkbox" checked={completed} disabled={!canEdit}
+               onChange={(e) => {
+                 setCompleted(e.target.checked);
+                 onSave(task.task_gid, { completed: e.target.checked });
+               }} />
+      </td>
       <td>{task.task_name}</td>
       <td>{task.project}</td>
       <td>{task.assignee || ''}</td>

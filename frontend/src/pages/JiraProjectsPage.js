@@ -32,7 +32,9 @@ export default function JiraProjectsPage() {
     setSyncing('Syncing...');
     try {
       const res = await client.post('/jira/sync');
-      setSyncing(`Synced ${res.data.projectsSynced} projects, ${res.data.issuesSynced} issues`);
+      const { projectsSynced, issuesSynced, errors } = res.data;
+      const errorSuffix = errors && errors.length > 0 ? ` (${errors.length} error(s): ${errors.join('; ')})` : '';
+      setSyncing(`Synced ${projectsSynced} projects, ${issuesSynced} issues${errorSuffix}`);
       loadProjects();
     } catch (err) {
       setSyncing('Failed: ' + (err.response?.data?.error || err.message));

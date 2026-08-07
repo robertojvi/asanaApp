@@ -5,6 +5,8 @@ import com.accessparks.asanaapp.model.JiraProject;
 import com.accessparks.asanaapp.repository.JiraIssueRepository;
 import com.accessparks.asanaapp.repository.JiraProjectRepository;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +26,15 @@ public class JiraSyncService {
     private final JiraClient jiraClient;
     private final JiraProjectRepository projectRepository;
     private final JiraIssueRepository issueRepository;
+
+    // Request-scoped (open-in-view) persistence context never gets cleared on its
+    // own, so saving thousands of issues in one request makes every subsequent
+    // save() dirty-check an ever-growing first-level cache (O(n^2)). Periodic
+    // clear() below keeps that cache bounded.
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    private static final int FLUSH_EVERY = 200;
 
     private static final String ISSUE_FIELDS = String.join(",",
         "summary", "status", "issuetype", "priority", "assignee", "reporter", "duedate", "created", "updated"
@@ -45,6 +57,9 @@ public class JiraSyncService {
                 for (JsonNode issueNode : getAllIssuePages(projectNode.get("key").asText())) {
                     upsertIssue(issueNode, projectId);
                     issuesSynced++;
+                    if (issuesSynced % FLUSH_EVERY == 0) {
+                        entityManager.clear();
+                    }
                 }
             } catch (Exception e) {
                 errors.add(projectNode.get("key").asText() + ": " + e.getMessage());
@@ -69,19 +84,25 @@ public class JiraSyncService {
 
     private List<JsonNode> getAllIssuePages(String projectKey) {
         List<JsonNode> all = new ArrayList<>();
-        int startAt = 0;
+        // Atlassian retired GET /search (returns 410) in favor of /search/jql,
+        // which pages via an opaque nextPageToken cursor instead of startAt/total.
+        String nextPageToken = null;
         while (true) {
-            JsonNode page = jiraClient.get("/search", Map.of(
-                "jql", "project = " + projectKey + " ORDER BY key",
-                "fields", ISSUE_FIELDS,
-                "startAt", String.valueOf(startAt),
-                "maxResults", "100"
-            ));
-            JsonNode issues = page.get("issues");
-            issues.forEach(all::add);
-            int total = page.get("total").asInt();
-            startAt += issues.size();
-            if (issues.isEmpty() || startAt >= total) break;
+            Map<String, String> params = new HashMap<>();
+            // Project keys can collide with JQL reserved words (e.g. "AS"), so
+            // the key must always be quoted.
+            params.put("jql", "project = \"" + projectKey + "\" ORDER BY key");
+            params.put("fields", ISSUE_FIELDS);
+            params.put("maxResults", "100");
+            if (nextPageToken != null) params.put("nextPageToken", nextPageToken);
+
+            JsonNode page = jiraClient.get("/search/jql", params);
+            page.get("issues").forEach(all::add);
+
+            JsonNode tokenNode = page.get("nextPageToken");
+            nextPageToken = (tokenNode != null && !tokenNode.isNull()) ? tokenNode.asText() : null;
+            boolean isLast = !page.has("isLast") || page.get("isLast").asBoolean();
+            if (isLast || nextPageToken == null) break;
         }
         return all;
     }

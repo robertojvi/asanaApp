@@ -21,7 +21,7 @@ function Nav() {
         AccessParks Asana App
       </div>
       <div className="navbar-links">
-        <NavLink to="/" end className="nav-link">Projects</NavLink>
+        <NavLink to="/" end className="nav-link">Asana Projects</NavLink>
         <NavLink to="/jira-projects" className="nav-link">Jira Projects</NavLink>
         <NavLink to="/sites" className="nav-link">Sites</NavLink>
         <NavLink to="/reports" className="nav-link">Reports</NavLink>

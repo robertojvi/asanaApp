@@ -46,6 +46,7 @@ public class SiteInventorySyncService {
     private static final Pattern OBJECT_ID_PATTERN = Pattern.compile("/assets/object/(\\d+)");
     private static final Pattern VENUE_KEY_PATTERN = Pattern.compile("Venue:(IHS-\\d+)");
     private static final Pattern SUBVENUE_KEY_PATTERN = Pattern.compile("Subvenue:(IHS-\\d+)");
+    private static final Pattern ASANA_PROJECT_PATTERN = Pattern.compile("app\\.asana\\.com/0/(\\d+)");
 
     public SyncResult syncAll() {
         List<SiteRow> siteRows = parseSiteList(client.fetchSiteList());
@@ -56,7 +57,7 @@ public class SiteInventorySyncService {
         for (SiteRow row : siteRows) {
             try {
                 Map<String, String> fields = parseSiteInfoFields(client.fetchSiteInfo(row.id(), row.name()));
-                upsertSite(row.id(), row.name(), fields);
+                upsertSite(row.id(), row.name(), row.asanaProjectGid(), fields);
                 sitesSynced++;
 
                 List<ParsedLocation> locations = parseLocationsAndDevices(client.fetchSubvenueDetail(row.id(), row.name()));
@@ -90,11 +91,16 @@ public class SiteInventorySyncService {
             Elements cells = tr.select("> td");
             if (cells.size() < 3) continue;
 
-            Matcher m = SUBVENUE_ID_PATTERN.matcher(tr.outerHtml());
+            String rowHtml = tr.outerHtml();
+            Matcher m = SUBVENUE_ID_PATTERN.matcher(rowHtml);
             if (!m.find()) continue;
             Long id = Long.valueOf(m.group(1));
             String name = cells.get(2).text().trim();
-            rows.add(new SiteRow(id, name));
+
+            Matcher am = ASANA_PROJECT_PATTERN.matcher(rowHtml);
+            String asanaProjectGid = am.find() ? am.group(1) : null;
+
+            rows.add(new SiteRow(id, name, asanaProjectGid));
         }
         // dedupe by id (each row links the same subvenue_id from several columns,
         // but there's exactly one <tr> per site so this is just a safety net)
@@ -126,9 +132,10 @@ public class SiteInventorySyncService {
         return fields;
     }
 
-    private void upsertSite(Long subvenueId, String fallbackName, Map<String, String> f) {
+    private void upsertSite(Long subvenueId, String fallbackName, String asanaProjectGid, Map<String, String> f) {
         Site site = siteRepository.findById(subvenueId).orElseGet(Site::new);
         site.setSubvenueId(subvenueId);
+        site.setAsanaProjectGid(asanaProjectGid);
         site.setVenueKey(f.get("_venueKey"));
         site.setSubvenueKey(f.get("_subvenueKey"));
         site.setVenueType(f.get("Venue_type"));
@@ -329,7 +336,7 @@ public class SiteInventorySyncService {
         }
     }
 
-    private record SiteRow(Long id, String name) {}
+    private record SiteRow(Long id, String name, String asanaProjectGid) {}
 
     private record ParsedLocation(Long id, String name, String latitude, String longitude, String type,
                                    String phase, String notes, List<ParsedDevice> devices) {}

@@ -75,6 +75,7 @@ export default function SitesPage() {
             style={{ background: selected?.subvenueId === s.subvenueId ? 'var(--color-navy, #1b2a4a)' : undefined }}
           >
             <span className="project-name">{s.venueName ? `${s.venueName} - ` : ''}{s.subvenueName}</span>
+            {s.asanaProjectGid && <span title="Has an Asana project" style={{ marginLeft: 6, color: '#8bc34a' }}>●</span>}
           </div>
         ))}
         {sites.length === 0 && (
@@ -91,6 +92,16 @@ export default function SitesPage() {
             <h2>{selected.venueName} {selected.subvenueName ? `- ${selected.subvenueName}` : ''}</h2>
             <table className="data-table" style={{ marginBottom: 24 }}>
               <tbody>
+                <tr>
+                  <td><b>Asana Project</b></td>
+                  <td>
+                    {selected.asanaProjectGid ? (
+                      <a href={`https://app.asana.com/0/${selected.asanaProjectGid}`} target="_blank" rel="noreferrer">
+                        {selected.asanaProjectGid}
+                      </a>
+                    ) : <span className="hint-text">No linked Asana project</span>}
+                  </td>
+                </tr>
                 <tr><td><b>Address</b></td><td>{selected.address}</td></tr>
                 <tr><td><b>Website</b></td><td>{selected.website}</td></tr>
                 <tr><td><b>Front Desk Phone</b></td><td>{selected.frontDeskPhone}</td></tr>

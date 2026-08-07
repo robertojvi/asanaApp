@@ -33,6 +33,12 @@ public class Site {
     @Column(name = "subvenue_key", columnDefinition = "TEXT")
     private String subvenueKey;
 
+    // Asana project gid, scraped from the "Proj" column's app.asana.com/0/{gid}
+    // link on sitelist.php. Not every site has one (e.g. decommissioned/spare
+    // sites usually don't) - nullable by design.
+    @Column(name = "asana_project_gid")
+    private String asanaProjectGid;
+
     @Column(name = "venue_type", columnDefinition = "TEXT")
     private String venueType;
 

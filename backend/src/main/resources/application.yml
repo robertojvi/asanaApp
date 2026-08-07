@@ -27,5 +27,10 @@ asana:
   token: ${ASANA_TOKEN}
   workspace-gid: ${ASANA_WORKSPACE_GID:943649575918213}
 
+jira:
+  site-url: ${JIRA_SITE_URL}
+  email: ${JIRA_EMAIL}
+  api-token: ${JIRA_API_TOKEN}
+
 sync:
   default-cron: "0 0 3 * * *" # 3am daily, matches the Node nightly resync

@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import ProjectsPage from './pages/ProjectsPage';
+import JiraProjectsPage from './pages/JiraProjectsPage';
 import ReportsPage from './pages/ReportsPage';
 import SyncPage from './pages/SyncPage';
 import UsersPage from './pages/UsersPage';
@@ -20,6 +21,7 @@ function Nav() {
       </div>
       <div className="navbar-links">
         <NavLink to="/" end className="nav-link">Projects</NavLink>
+        <NavLink to="/jira-projects" className="nav-link">Jira Projects</NavLink>
         <NavLink to="/reports" className="nav-link">Reports</NavLink>
         {canEdit && <NavLink to="/sync" className="nav-link">Sync</NavLink>}
         {canManageUsers && <NavLink to="/users" className="nav-link">Users</NavLink>}
@@ -41,6 +43,7 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
+          <Route path="/jira-projects" element={<ProtectedRoute><JiraProjectsPage /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
           <Route path="/sync" element={
             <ProtectedRoute require={(auth) => auth.canEdit}><SyncPage /></ProtectedRoute>

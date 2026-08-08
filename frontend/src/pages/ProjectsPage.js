@@ -86,12 +86,12 @@ export default function ProjectsPage() {
         {projects
           .filter((p) => p.project.toLowerCase().includes(search.trim().toLowerCase()))
           .map((p) => (
-          <div key={p.project_gid} className="project-row" onClick={() => toggle(p.project_gid)}>
-            <input type="checkbox" checked={selected.has(p.project_gid)} readOnly />
-            <span className="project-name">{p.project}</span>
-            <span className="project-pct">{p.pct_complete ?? 0}%</span>
-          </div>
-        ))}
+            <div key={p.project_gid} className="project-row" onClick={() => toggle(p.project_gid)}>
+              <input type="checkbox" checked={selected.has(p.project_gid)} readOnly />
+              <span className="project-name">{p.project}</span>
+              <span className="project-pct">{p.pct_complete ?? 0}%</span>
+            </div>
+          ))}
       </div>
       <div className="content-pane">
         {selected.size === 0 ? (
@@ -127,27 +127,27 @@ function TaskRow({ task, canEdit, onSave }) {
     <tr className={completed ? 'row-completed' : ''}>
       <td>
         <input type="checkbox" checked={completed} disabled={!canEdit}
-               onChange={(e) => {
-                 setCompleted(e.target.checked);
-                 onSave(task.task_gid, { completed: e.target.checked });
-               }} />
+          onChange={(e) => {
+            setCompleted(e.target.checked);
+            onSave(task.task_gid, { completed: e.target.checked });
+          }} />
       </td>
       <td>{task.task_name}</td>
       <td>{task.project}</td>
       <td>{task.assignee || ''}</td>
       <td>
         <input type="date" value={dueOn} disabled={!canEdit}
-               onChange={(e) => setDueOn(e.target.value)}
-               onBlur={() => canEdit && onSave(task.task_gid, { dueOn: dueOn || null })} />
+          onChange={(e) => setDueOn(e.target.value)}
+          onBlur={() => canEdit && onSave(task.task_gid, { dueOn: dueOn || null })} />
       </td>
       <td>
         {task.expected_due_date_field_gid ? (
           <input type="date" value={expDate} disabled={!canEdit}
-                 onChange={(e) => setExpDate(e.target.value)}
-                 onBlur={() => canEdit && onSave(task.task_gid, {
-                   expectedDueDateFieldGid: task.expected_due_date_field_gid,
-                   expectedDueDate: expDate || null,
-                 })} />
+            onChange={(e) => setExpDate(e.target.value)}
+            onBlur={() => canEdit && onSave(task.task_gid, {
+              expectedDueDateFieldGid: task.expected_due_date_field_gid,
+              expectedDueDate: expDate || null,
+            })} />
         ) : <span style={{ color: '#bbb' }}>n/a</span>}
       </td>
     </tr>

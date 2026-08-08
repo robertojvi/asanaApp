@@ -14,6 +14,7 @@ export default function SitesPage() {
   const [locations, setLocations] = useState([]);
   const [devicesByLocation, setDevicesByLocation] = useState({});
   const [syncing, setSyncing] = useState('');
+  const [buildingProgress, setBuildingProgress] = useState('');
 
   function loadSites() {
     client.get('/sites').then((res) => setSites(res.data));
@@ -22,6 +23,7 @@ export default function SitesPage() {
   useEffect(() => { loadSites(); }, []);
 
   useEffect(() => {
+    setBuildingProgress('');
     if (!selected) { setLocations([]); setDevicesByLocation({}); return; }
     client.get(`/sites/${selected.subvenueId}/locations`).then((res) => {
       setLocations(res.data);
@@ -48,6 +50,17 @@ export default function SitesPage() {
       loadSites();
     } catch (err) {
       setSyncing('Failed: ' + (err.response?.data?.error || err.message));
+    }
+  }
+
+  async function createConstructionProgress() {
+    setBuildingProgress('Creating Construction Progress tasks in Asana...');
+    try {
+      const res = await client.post(`/sites/${selected.subvenueId}/construction-progress`);
+      const { tasksCreated, tasksUpdated, subtasksCreated, subtasksUpdated } = res.data;
+      setBuildingProgress(`Done: ${tasksCreated} task(s) created, ${tasksUpdated} task(s) updated, ${subtasksCreated} subtask(s) created, ${subtasksUpdated} subtask(s) updated`);
+    } catch (err) {
+      setBuildingProgress('Failed: ' + (err.response?.data?.error || err.message));
     }
   }
 
@@ -119,7 +132,15 @@ export default function SitesPage() {
               </tbody>
             </table>
 
-            <h3>Jira Location/Device List</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <h3 style={{ margin: 0 }}>Jira Location/Device List</h3>
+              {canEdit && selected.asanaProjectGid && (
+                <button className="btn-primary" onClick={createConstructionProgress}>
+                  Create Construction Progress Tasks
+                </button>
+              )}
+            </div>
+            {buildingProgress && <p className="status-text" style={{ marginTop: 6 }}>{buildingProgress}</p>}
             {locations.length === 0 ? (
               <p className="empty-state">No locations recorded for this site.</p>
             ) : (

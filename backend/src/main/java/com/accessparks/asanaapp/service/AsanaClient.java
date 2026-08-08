@@ -98,4 +98,52 @@ public class AsanaClient {
         }
         throw new RuntimeException("Timed out waiting for Asana duplication job");
     }
+
+    /** Finds a section by name in a project, creating it if it doesn't exist yet. Returns the section gid. */
+    public String findOrCreateSection(String projectGid, String sectionName) {
+        JsonNode sections = get("/projects/" + projectGid + "/sections", Map.of("opt_fields", "name")).get("data");
+        for (JsonNode section : sections) {
+            if (sectionName.equals(section.get("name").asText())) {
+                return section.get("gid").asText();
+            }
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", sectionName);
+        return post("/projects/" + projectGid + "/sections", data).get("data").get("gid").asText();
+    }
+
+    /** Lists the tasks (gid, name, completed) currently filed under a section. */
+    public JsonNode getSectionTasks(String sectionGid) {
+        return get("/sections/" + sectionGid + "/tasks", Map.of("opt_fields", "name,completed")).get("data");
+    }
+
+    /** Creates a task in a project and files it under the given section. Returns the task gid. */
+    public String createTaskInSection(String projectGid, String sectionGid, String name) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", name);
+        data.put("projects", new String[]{projectGid});
+        String taskGid = post("/tasks", data).get("data").get("gid").asText();
+        Map<String, Object> addTaskData = new HashMap<>();
+        addTaskData.put("task", taskGid);
+        post("/sections/" + sectionGid + "/addTask", addTaskData);
+        return taskGid;
+    }
+
+    /** Lists the subtasks (gid, name, completed) of a task. */
+    public JsonNode getSubtasks(String taskGid) {
+        return get("/tasks/" + taskGid + "/subtasks", Map.of("opt_fields", "name,completed")).get("data");
+    }
+
+    /** Creates a subtask under a parent task. Returns the subtask gid. */
+    public String createSubtask(String parentTaskGid, String name, boolean completed) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", name);
+        data.put("completed", completed);
+        return post("/tasks/" + parentTaskGid + "/subtasks", data).get("data").get("gid").asText();
+    }
+
+    /** Applies a partial update (e.g. name and/or completed) to an existing task or subtask. */
+    public void updateTask(String taskGid, Map<String, Object> data) {
+        put("/tasks/" + taskGid, data);
+    }
 }

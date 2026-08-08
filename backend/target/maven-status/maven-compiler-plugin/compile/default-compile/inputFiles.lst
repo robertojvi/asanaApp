@@ -18,14 +18,18 @@
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/Role.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/Site.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/SiteDevice.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/SiteDeviceAsanaTask.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/SiteLocation.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/SiteLocationAsanaTask.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/model/SyncConfig.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/AppUserRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/AsanaProjectRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/AsanaTaskRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/JiraIssueRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/JiraProjectRepository.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/SiteDeviceAsanaTaskRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/SiteDeviceRepository.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/SiteLocationAsanaTaskRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/SiteLocationRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/SiteRepository.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/repository/SyncConfigRepository.java
@@ -34,6 +38,7 @@
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/security/JwtUtil.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/AsanaClient.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/AsanaSyncService.java
+/Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/ConstructionProgressService.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/FieldNameMapper.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/JiraClient.java
 /Users/robertojvi/Documents/AccessParksApp/asana-app/backend/src/main/java/com/accessparks/asanaapp/service/JiraSyncService.java

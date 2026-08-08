@@ -6,6 +6,7 @@ import com.accessparks.asanaapp.model.SiteLocation;
 import com.accessparks.asanaapp.repository.SiteDeviceRepository;
 import com.accessparks.asanaapp.repository.SiteLocationRepository;
 import com.accessparks.asanaapp.repository.SiteRepository;
+import com.accessparks.asanaapp.service.ConstructionProgressService;
 import com.accessparks.asanaapp.service.SiteInventorySyncService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -25,6 +26,7 @@ public class SiteController {
     private final SiteLocationRepository locationRepository;
     private final SiteDeviceRepository deviceRepository;
     private final SiteInventorySyncService siteInventorySyncService;
+    private final ConstructionProgressService constructionProgressService;
 
     @GetMapping
     public List<Site> listSites() {
@@ -55,6 +57,25 @@ public class SiteController {
                 "devicesSynced", result.devicesSynced(),
                 "errors", result.errors()
             ));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PreAuthorize("hasAnyRole('SUPER_USER', 'ADMIN')")
+    @PostMapping("/{subvenueId}/construction-progress")
+    public ResponseEntity<?> createConstructionProgress(@PathVariable Long subvenueId) {
+        try {
+            ConstructionProgressService.Result result = constructionProgressService.generate(subvenueId);
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "tasksCreated", result.tasksCreated(),
+                "tasksUpdated", result.tasksUpdated(),
+                "subtasksCreated", result.subtasksCreated(),
+                "subtasksUpdated", result.subtasksUpdated()
+            ));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }

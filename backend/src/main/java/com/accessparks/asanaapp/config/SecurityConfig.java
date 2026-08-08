@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/projects/**", "/api/reports/**", "/api/tasks/**", "/api/jira/**", "/api/sites/**").authenticated()
                 // Only SUPER_USER and ADMIN can create/edit projects, edit task dates, or run syncs.
                 // (Also enforced via @PreAuthorize on the controller methods as defense in depth.)
-                .requestMatchers("/api/projects/**", "/api/sync/**", "/api/tasks/**", "/api/jira/sync", "/api/sites/sync").hasAnyRole("SUPER_USER", "ADMIN")
+                .requestMatchers("/api/projects/**", "/api/sync/**", "/api/tasks/**", "/api/jira/sync", "/api/sites/sync", "/api/sites/*/construction-progress").hasAnyRole("SUPER_USER", "ADMIN")
                 // Only SUPER_USER can manage app users/profiles.
                 .requestMatchers("/api/users/**").hasRole("SUPER_USER")
                 .anyRequest().authenticated()
